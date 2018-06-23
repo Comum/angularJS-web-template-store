@@ -11,9 +11,31 @@ angular
                 controller: 'TemplateDetailsCtrl'
             });
     }])
-    .controller('TemplatesCtrl', ['$scope', function ($scope) {
-        console.log($scope);
+    .controller('TemplatesCtrl', ['$scope', '$http', function ($scope, $http) {
+        $http
+            .get('json/templates.json')
+            .success(function (data) {
+                $scope.templates = data;
+            });
     }])
-    .controller('TemplateDetailsCtrl', ['$scope', function ($scope) {
+    .controller('TemplateDetailsCtrl', [
+        '$scope',
+        '$http',
+        '$routeParams',
+        '$filter',
+        function ($scope, $http, $routeParams, $filter) {
+        let templateId = $routeParams.templateId;
 
+        $http
+            .get('json/templates.json')
+            .success(function (data) {
+                $scope.template = $filter('filter')(data, function(d) {
+                    return d.id == templateId;
+                })[0];
+                $scope.mainImage = $scope.template.images[0].name;
+            });
+
+        $scope.setImage = function (img) {
+            $scope.mainImage = img.name;
+        }
     }]);
